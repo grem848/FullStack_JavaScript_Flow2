@@ -5,16 +5,67 @@
 
 >## Why would you consider a Scripting Language as JavaScript as your Backend Platform?
 
+* It's easy and fast to build and setup a working network application with node.js, express, MongoDB, mongoose and Mocha tests. Very little code is required to make a fully functional application with a backend.
+
+* It's very easy to work with since you use the same language both in frontend and in the backend.
+
+* Not a lot of code is required for an application to run and it's easy to install and share.
+
+
 >## Explain Pros & Cons in using Node.js + Express to implement your Backend compared to a strategy using, for example, Java/JAX-RS/Tomcat
 
+## Pros
+* You can make a good and responsive network application, pretty fast.
+
+* Allows the use of data streaming, web sockets and fast file uploads.
+
+* It's easy to set up a REST-API with express.
+
+* It is efficient at handling thousands of concurrent requests (For example - a chat application).
+
+* It is very simple to implement server middleware, that will be executed between all requests.
+
+## Cons
+* Java is good at handling CPU heavy tasks, Node.JS + Express is not. Because Node is, despite its asynchronous event model, by nature single threaded. When you launch a Node process, you are running a single process with a single thread on a single core. So your code will not be executed in parallel, only I/O operations are parallel because they are executed asynchronous. As such, long running CPU tasks will block the whole server and are usually a bad idea.
+
+* Java integrates well with relational databases like MySQL. Node.JS + Express does not, they have mongoDB but that isn't relational.
+
+* Java as oppposed to Node.JS + Express is a strictly typed language which provides a certain security.
+
+* 500 errors in Node.JS and Express will crash the entire application, Java will not.
+
+
 >## Node.js uses a Single Threaded Non-blocking strategy to handle asynchronous task. Explain strategies to implement a Node.js based server architecture that still could take advantage of a multi-core Server.
+
+## Solution 1 (built it)
+
+Node.js does not come with mutlithreading out of the box, since it's single threaded, but it is possible to build and program it yourself. We just haven't done that in class.
+
+## Solution 2 (Multiple servers)
+
+For scaling throughout on a webservice, you should run multiple Node.js servers on one or more machine/es, one per core and split request traffic between them. This provides excellent CPU-affinity and will scale throughout nearly linearly with core count. You could also put a load balancer in front of it. The load balancer will balance the load of incoming requests, thus achieving a multicore solution
 
 >## Explain briefly how to deploy a Node/Express application including how to solve the following deployment problems:
 
 * ### Ensure that you Node-process restarts after a (potential) exception that closed the application
+
+To ensure my application will work I would use nodemon at least for development, nodemon is a utility that restarts the server or the application if it crashes or after something. Or you could use a process manager like PM2.
+
+
 * ### Ensure that you Node-process restarts after a server (Ubuntu) restart
+
+Here I could for development also use nodemon.
+
+
 * ### Ensure that you can take advantage of a multi-core system
+
+Use the web api's SetTimeout or similar to delegate tasks to the browsers multi-threading capabilities. Or one could use the cluster module for node, which is probably the best solution.
+
+
 * ### Ensure that you can run “many” node-applications on a single droplet on the same port (80)
+
+You could configure a load balancer for this purpose. Nginx could also be used as a reverse proxy.
+
 
 >## Explain the difference between “Debug outputs” and application logging. What’s wrong with console.log(..) statements in our backend-code.
 
