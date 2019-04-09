@@ -1,5 +1,5 @@
 var mongoose = require('mongoose')
-var mongoDB = "connection string";
+var mongoDB = "connection string classdemo1";
 /*
   Insert your connection string to your Cloud based Mongo DB on Atlas below.
   Remember to insert you own userName, Password and name of DB (instead of the suggested /test)
