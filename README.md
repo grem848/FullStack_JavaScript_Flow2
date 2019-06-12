@@ -501,44 +501,28 @@ Normalization and denormalization are the methods used in databases:
 
 * The terms are differentiable where Normalization is a technique of minimizing the insertion, deletion and update anomalies through eliminating the redundant data. 
 
-*On the other hand, Denormalization is the inverse process of normalization where the redundancy is added to the data to improve the performance of the specific application and data integrity.
+* On the other hand, Denormalization is the inverse process of normalization where the redundancy is added to the data to improve the performance of the specific application and data integrity.
 
-Embed (Sub Docs)
+Users have a one-to-few jobs therefore we have embedded the job data into user, normalizing it.
 
 ```js
-var addressSchema = new Schema({
-    street : String, zip : String
-})
-var userSchema = new Schema({
-    name: String,
-    addresses :[addressSchema]
+var JobSchema = new Schema({
+	type: String,
+	company: String,
+	companyUrl: String
 });
-```
 
-Reference on the one-side
-```js
-var userSchema = new Schema({
-    name: String,
-    addresses : [{ type: Schema.Types.ObjectId, ref: 'Address' }]
-  });
-  var addressSchema = new Schema({
-      street : String,zip : String
-  })
-  let User = mongoose.model('User', userSchema);
-  let Address = mongoose.model('Address', addressSchema);
-```
+var UserSchema = new Schema({
+	firstName: String,
+	lastName: String,
+	userName: { type: String, unique: true, required: true },
+	password: { type: String, required: true },
+	email: { type: String, required: true },
+	job: [ JobSchema ],
+	created: { type: Date, default: Date.now },
+	lastUpdated: Date
+});
 
-Reference on the N-side
-```js
-  var userSchema = new Schema({
-    name: String,
-  });
-  var addressSchema = new Schema({
-      street : String,zip : String,
-      owner: {type: Schema.Types.ObjectId, ref : "User"}
-  })
-  let User = mongoose.model('User', userSchema);
-  let Address = mongoose.model('Address', addressSchema);
 ```
 >## Explain, using a relevant example, a full JavaScript backend including relevant test cases to test the REST-API (not on the production database)
 
