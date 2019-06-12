@@ -175,7 +175,56 @@ app.use(logger('dev'));
 
 [Link to week 2 with testing](https://github.com/grem848/FullStack_JavaScript_Flow2/tree/master/week2-testing)
 
-Testing a REST API is much easlier in JavaScript than in many other languages like Java. When using languages like Java, web services often need to be deployed to a dedicated server. Using JavaScript we can programmatically start our express server using the listen method. We can then use the node-fetch to make requests to the REST API. 
+Testing a REST API is much easier in JavaScript than in many other languages like Java. When using languages like Java, web services often need to be deployed to a dedicated server. Using JavaScript we can programmatically start our express server using the listen method. We can then use the node-fetch to make requests to the REST API. 
+
+
+```js
+describe("Calculator API", function () {
+
+    describe("Testing the basic Calc API", function () {
+        it("Add 4 + 3 should return 7", function () {
+            const result = calc.add(4, 3);
+            expect(result).to.be.equal(7);
+        })
+
+        it("Subtract 4 - 3 should return 1", function () {
+            const result = calc.subtract(4, 3);
+            expect(result).to.be.equal(1);
+        })
+
+        it("Multiply 4 * 3 should return 12", function () {
+            const result = calc.multiply(4, 3);
+            expect(result).to.be.equal(12);
+        })
+
+    })
+
+    describe("Testing the REST Calc API", function () {
+        before(function (done) {
+            calc.calcServer(PORT, function (s) {
+                server = s;
+                done();
+                console.log("Server Started")
+            })
+        })
+        after(function () {
+            server.close();
+            console.log("Server Closed")
+        })
+        it("Add 4 + 3 should return 7", async function () {
+            const result = await fetch(URL + "add/4/3").then(r => r.text());
+            expect(result).to.be.equal('7');
+        })
+        it("Subtract 4 - 3 should return 1", async function () {
+            const result = await fetch(URL + "subtract/4/3").then(r => r.text());
+            expect(result).to.be.equal('1');
+        })
+        it("Multiply 4 * 3 should return 12", async function () {
+            const result = await fetch(URL + "multiply/4/3").then(r => r.text());
+            expect(result).to.be.equal('12');
+        })
+    })
+```
 
 >## Explain, using relevant examples, the Express concept; `middleware`
 
@@ -194,13 +243,12 @@ Middleware functions can perform the following tasks:
 If the current middleware function does not end the request-response cycle, it must call next() to pass control to the next middleware function. Otherwise, the request will be left hanging.
 
 
-A middleware with no mount path will be executed every time the app recieves a request
+A middleware
 ```js
-var app = express()
-app.use(function (req, res, next) {
-    console.log('Time:', Date.now())
-    next()
-})
+/* GET users listing. */
+router.get('/users', async function(req, res, next) {
+	res.json({ users: await userFacade.getAllUsers() });
+});
 ```
 
 >## Explain, using relevant examples, how to implement sessions and the legal implications of doing this.
@@ -294,6 +342,16 @@ describe("loadWiki()", function() {
 * https://www.codementor.io/mattgoldspink/nodejs-best-practices-du1086jja
 
 
+Things to do in your code
+Here are some things you can do in your code to improve your application’s performance:
+
+* Use gzip compression
+* Don’t use synchronous functions
+* Do logging correctly
+* Handle exceptions properly
+* Use DEBUG
+
+
 # NoSQL, MongoDB and Mongoose
 
 >## Explain, generally, what is meant by a NoSQL database.
@@ -365,21 +423,53 @@ Despite the arguments against using Mongoose, it remains one of the most popular
 
 >## Explain about indexes in MongoDB, how to create them, and demonstrate how you have used them.
 
-This topic will be introduced in period-3
+Indexes support the efficient resolution of queries. Without indexes, MongoDB must scan every document of a collection to select those documents that match the query statement. This scan is highly inefficient and require MongoDB to process a large volume of data.
+
+```js
+const user_id = await User.findOne({ userName: username }).select({ _id: 1 });
+```
+Here key is the name of the field on which you want to create index and 1 is for ascending order. To create index in descending order you need to use -1.
 
 >## Explain, using your own code examples, how you have used some of MongoDB's "special" indexes like TTL and 2dsphere
 
-These two topics will be introduced in period-3
+### TTL
+TTL indexes are special single-field indexes that MongoDB can use to automatically remove documents from a collection after a certain amount of time or at a specific clock time. Data expiration is useful for certain types of information like machine generated event data, logs, and session information that only need to persist in a database for a finite amount of time.
+
+### 2dsphere
+A 2dsphere index supports queries that calculate geometries on an earth-like sphere. 2dsphere index supports all MongoDB geospatial queries: queries for inclusion, intersection and proximity.
+* Longitude, latitude.
+
+```js
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+const SECONDS = 1;
+var EXPIRES = 60 * 60 * SECONDS; // change back to 1 min instead of 1 hour
+var PositionSchema = new Schema({
+	//Make sure that next line reflects your User-model
+	user: { type: Schema.ObjectId, ref: 'User', required: true },
+	created: { type: Date, expires: EXPIRES, default: Date.now },
+	loc: {
+		type: { type: String, enum: ['Point'], default: 'Point', required: true },
+		coordinates: {
+			type: [Number],
+			required: true
+		}
+	}
+});
+PositionSchema.index({ loc: '2dsphere' }, { background: true });
+
+module.exports = mongoose.model('Position', PositionSchema);
+```
 
 >## Demonstrate, using a REST-API you have designed, how to perform all CRUD operations on a MongoDB
 
 https://vegibit.com/mongoose-crud-tutorial/
 
-https://github.com/grem848/mini-project-fullstackjs2019
+https://github.com/grem848/mini-project-fullstackjs2019/tree/master/routes
 
 >## Explain the benefits of using Mongoose, and demonstrate, using your own code, an example involving all CRUD operations
 
-Benefits were explained in 
+https://github.com/grem848/mini-project-fullstackjs2019
 
 ### Explain reasons to add a layer like Mongoose, on top on of a schema-less database like MongoDB
 
@@ -406,6 +496,12 @@ Here are some “rules of thumb” to guide you through these indenumberable (bu
 >## Demonstrate, using your own code-samples, decisions you have made regarding → normalization vs denormalization 
 
 https://techdifferences.com/difference-between-normalization-and-denormalization.html
+
+Normalization and denormalization are the methods used in databases:
+
+* The terms are differentiable where Normalization is a technique of minimizing the insertion, deletion and update anomalies through eliminating the redundant data. 
+
+*On the other hand, Denormalization is the inverse process of normalization where the redundancy is added to the data to improve the performance of the specific application and data integrity.
 
 Embed (Sub Docs)
 
