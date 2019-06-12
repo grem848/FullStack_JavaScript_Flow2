@@ -164,6 +164,13 @@ debug('myapp:thirdparty:identica:auth')('success!');
 debug('myapp:thirdparty:twitter:auth')('success!');
 ```
 
+Basic Logging
+```js
+var logger = require('morgan');
+
+app.use(logger('dev'));
+```
+
 >## Explain, using relevant examples, concepts related to testing a REST-API using Node/JavaScript + relevant packages 
 
 [Link to week 2 with testing](https://github.com/grem848/FullStack_JavaScript_Flow2/tree/master/week2-testing)
